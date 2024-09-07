@@ -1,0 +1,30 @@
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.datasets import fetch_california_housing
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+
+# Load the California Housing dataset
+data = fetch_california_housing()
+X = data.data[:, 0].reshape(-1, 1)  # Use only one feature for plotting (e.g., 'MedInc' - Median Income)
+y = data.target  # Target variable (house prices)
+
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Initialize and train the linear regression model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Make predictions
+y_pred = model.predict(X_test)
+
+# Plotting scatter plot with regression line
+plt.figure(figsize=(8, 6))
+sns.scatterplot(x=X_test.flatten(), y=y_test, color='blue', label='Actual Data')
+plt.plot(X_test, y_pred, color='red', linewidth=2, label='Regression Line')
+plt.xlabel('Median Income')
+plt.ylabel('House Price')
+plt.title('Scatter Plot with Regression Line (California Housing Dataset)')
+plt.legend()
+plt.show()
