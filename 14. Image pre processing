@@ -1,0 +1,37 @@
+import cv2
+import numpy as np
+from sklearn.datasets import fetch_openml
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+
+# Load the MNIST dataset
+mnist = fetch_openml('mnist_784', version=1)
+X, y = mnist['data'], mnist['target']
+
+# Preprocess: Apply Otsu's thresholding to each image
+def preprocess_images(images):
+    processed_images = []
+    for img in images:
+        img = img.reshape(28, 28).astype(np.uint8)  # Reshape to 28x28
+        # Apply Otsu's thresholding
+        _, otsu_thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        processed_images.append(otsu_thresh.flatten())  # Flatten back to 1D
+    return np.array(processed_images)
+
+# Apply preprocessing
+X_processed = preprocess_images(X)
+
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X_processed, y, test_size=0.2, random_state=42)
+
+# Train a simple classifier (Logistic Regression)
+clf = LogisticRegression(max_iter=1000)
+clf.fit(X_train, y_train)
+
+# Predict on the test set
+y_pred = clf.predict(X_test)
+
+# Evaluate performance
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Accuracy after applying Otsu's thresholding: {accuracy:.2f}")
